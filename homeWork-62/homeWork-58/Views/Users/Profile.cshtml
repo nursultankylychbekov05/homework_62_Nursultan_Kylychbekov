@@ -1,0 +1,112 @@
+﻿@model InstagramApp.Models.User
+@{ ViewData["Title"] = Model.UserName; }
+
+<div class="row mb-5 align-items-center">
+    <div class="col-md-4 text-center">
+        <img src="@Model.Avatar" class="avatar-lg rounded-circle" style="width: 150px; height: 150px; object-fit: cover;" />
+    </div>
+    <div class="col-md-8">
+        <div class="d-flex align-items-center gap-3 mb-3">
+            <h3>@Model.UserName</h3>
+            @if (!ViewBag.IsCurrentUser)
+            {
+                <button id="follow-btn" data-user-id="@Model.Id" class="btn @(ViewBag.IsFollowing ? "btn-outline-secondary" : "btn-primary") btn-sm fw-bold">
+                    @(ViewBag.IsFollowing ? "Отписаться" : "Подписаться")
+                </button>
+            }
+        </div>
+        <div class="d-flex gap-4 mb-3 fs-5">
+            <div><strong>@Model.PostsCount</strong> публикаций</div>
+            <div><strong id="subscribers-count">@Model.SubscribersCount</strong> подписчиков</div>
+            <div><strong>@Model.SubscriptionsCount</strong> подписок</div>
+        </div>
+        <div>
+            <strong>@Model.Name</strong>
+            <p class="mb-0">@Model.Bio</p>
+        </div>
+    </div>
+</div>
+
+<hr />
+
+<div class="row row-cols-3 g-3" id="user-posts-grid">
+    @foreach (var post in Model.Posts)
+    {
+        <div class="col position-relative post-card-container" id="post-item-@post.Id">
+            <div class="card h-100 border-0 shadow-sm">
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id">
+                    <img src="@post.ImageUrl" class="w-100 rounded" style="object-fit: cover; aspect-ratio: 1/1;" />
+                </a>
+                
+                @if (ViewBag.IsCurrentUser)
+                {
+                    <div class="card-body p-2 d-flex justify-content-between bg-light rounded-bottom">
+                        <button class="btn btn-sm btn-outline-primary edit-post-btn" data-post-id="@post.Id" data-current-desc="@post.Description">Изменить</button>
+                        <button class="btn btn-sm btn-outline-danger delete-post-btn" data-post-id="@post.Id">Удалить</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $('#follow-btn').on('click', function () {
+            const targetUserId = $(this).data('user-id');
+            const $btn =$(this);
+
+            $.ajax({
+                url: '/Users/ToggleFollow',
+                type: 'POST',
+                data: { targetUserId: targetUserId },
+                success: function (response) {
+                    if (response.success) {
+                        if (response.isFollowing) {
+                            $btn.text('Отписаться').removeClass('btn-primary').addClass('btn-outline-secondary');
+                        } else {
+                            $btn.text('Подписаться').removeClass('btn-outline-secondary').addClass('btn-primary');
+                        }
+                        $('#subscribers-count').text(response.subscribersCount);
+                    }
+                }
+            });
+        });
+        
+        $(document).on('click', '.delete-post-btn', function () {
+            if (!confirm('Вы уверены, что хотите удалить эту публикацию?')) return;
+
+            const postId = $(this).data('post-id');$.ajax({
+                url: '/Posts/DeletePost',
+                type: 'POST',
+                data: { id: postId },
+                success: function (response) {
+                    if (response.success) {
+                        $(`#post-item-${postId}`).fadeOut(300, function () { $(this).remove(); });
+                    }
+                }
+            });
+        });
+        
+        $(document).on('click', '.edit-post-btn', function () {
+            const postId = $(this).data('post-id');
+            const currentDesc = $(this).data('current-desc') || "";
+            const newDesc = prompt('Введите новое описание:', currentDesc);
+
+            if (newDesc !== null) {
+                $.ajax({
+                    url: '/Posts/EditPostDescription',
+                    type: 'POST',
+                    data: { id: postId, description: newDesc },
+                    success: function (response) {
+                        if (response.success) {
+                            $(`button[data-post-id="${postId}"]`).data('current-desc', response.description);
+                            alert('Описание успешно обновлено!');
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

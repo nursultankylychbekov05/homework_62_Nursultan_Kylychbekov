@@ -1,0 +1,20 @@
+﻿@{ ViewData["Title"] = "Новая публикация"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h4 class="mb-3 text-center">Создание публикации</h4>
+            <form asp-action="Create" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label class="form-label">Выберите изображение:</label>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Описание:</label>
+                    <textarea name="description" class="form-control" rows="3" placeholder="Добавьте подпись..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+</div>

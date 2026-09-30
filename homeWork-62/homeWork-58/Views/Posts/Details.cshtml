@@ -1,0 +1,75 @@
+﻿@model InstagramApp.Models.Post
+@{
+    ViewData["Title"] = "Публикация";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card d-flex flex-row overflow-hidden" style="max-height: 600px;">
+            <div class="bg-black d-flex align-items-center justify-content-center w-60" style="flex: 1.5; background-color: #000;">
+                <img src="@Model.ImageUrl" class="img-fluid" style="max-height: 600px; object-fit: contain;" />
+            </div>
+            
+            <div class="d-flex flex-column w-40 bg-white" style="flex: 1; border-left: 1px solid #dbdbdb;">
+                <div class="p-3 border-bottom d-flex align-items-center">
+                    <img src="@Model.User?.Avatar" class="avatar-sm me-2" />
+                    <a asp-controller="Users" asp-action="Profile" asp-route-id="@Model.UserId" class="fw-bold text-dark text-decoration-none">
+                        @Model.User?.UserName
+                    </a>
+                </div>
+                
+                <div class="p-3 flex-grow-1 overflow-auto" style="font-size: 14px;">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="d-flex mb-3">
+                            <img src="@Model.User?.Avatar" class="avatar-sm me-2" />
+                            <div>
+                                <strong>@Model.User?.UserName</strong> @Model.Description
+                                <div class="text-muted small mt-1">@Model.CreatedAt.ToString("g")</div>
+                            </div>
+                        </div>
+                    }
+                    
+                    @foreach (var comment in Model.Comments)
+                    {
+                        <div class="d-flex mb-2">
+                            <img src="@comment.User?.Avatar" class="avatar-sm me-2" />
+                            <div>
+                                <strong>@comment.User?.UserName</strong> @comment.Text
+                                <div class="text-muted small" style="font-size: 11px;">@comment.CreatedAt.ToString("g")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                
+                <div class="p-3 border-top">
+                    <div class="d-flex gap-3 fs-4 mb-1">
+                        <form asp-controller="Posts" asp-action="ToggleLike" method="post">
+                            <input type="hidden" name="postId" value="@Model.Id" />
+                            <button type="submit" class="btn p-0 border-0 fs-4">
+                                @if (ViewBag.HasLiked == true)
+                                {
+                                    <i class="bi bi-heart-fill text-danger"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-heart"></i>
+                                }
+                            </button>
+                        </form>
+                    </div>
+                    <div class="fw-bold">@Model.LikesCount отметок "Нравится"</div>
+                    <div class="text-muted small" style="font-size: 10px;">@Model.CreatedAt.ToString("f")</div>
+                </div>
+                
+                <div class="p-3 border-top">
+                    <form asp-controller="Posts" asp-action="AddComment" method="post" class="d-flex">
+                        <input type="hidden" name="postId" value="@Model.Id" />
+                        <input type="text" name="text" class="form-control border-0 shadow-none ps-0" placeholder="Добавьте комментарий..." required />
+                        <button type="submit" class="btn btn-link text-primary text-decoration-none fw-bold p-0">Опубликовать</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

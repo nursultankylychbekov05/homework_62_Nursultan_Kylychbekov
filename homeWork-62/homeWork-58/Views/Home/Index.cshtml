@@ -1,0 +1,80 @@
+﻿@model IEnumerable<InstagramApp.Models.Post>
+@{ ViewData["Title"] = "Главная"; }
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        @if (!Model.Any())
+        {
+            <div class="text-center my-5">
+                <h4>Лента пуста</h4>
+                <p class="text-muted">Подпишитесь на других пользователей или опубликуйте первый пост!</p>
+            </div>
+        }
+        @foreach (var post in Model)
+        {
+            <div class="card mb-4">
+                <div class="card-header bg-white d-flex align-items-center justify-content-between py-2">
+                    <a asp-controller="Users" asp-action="Profile" asp-route-id="@post.UserId" class="d-flex align-items-center text-decoration-none text-dark fw-bold">
+                        <img src="@post.User?.Avatar" class="avatar-sm me-2" />
+                        <span>@post.User?.UserName</span>
+                    </a>
+                </div>
+                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id">
+                    <img src="@post.ImageUrl" class="card-img-top rounded-0" style="max-height: 600px; object-fit: cover;" />
+                </a>
+                <div class="card-body">
+                    <div class="d-flex gap-3 fs-4 mb-2">
+                        <button type="button" class="btn p-0 border-0 fs-4 like-btn" data-post-id="@post.Id">
+                            @if (post.Likes.Any(l => l.UserId == ViewBag.CurrentUserId))
+                            {
+                                <i class="bi bi-heart-fill text-danger like-icon"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-heart like-icon"></i>
+                            }
+                        </button>
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id" class="text-dark"><i class="bi bi-chat"></i></a>
+                    </div>
+                    <p class="fw-bold mb-1 likes-count-text">@post.LikesCount отметок "Нравится"</p>
+                    <p class="mb-1"><strong>@post.User?.UserName</strong> @post.Description</p>
+                    @if (post.CommentsCount > 0)
+                    {
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.Id" class="text-muted small text-decoration-none">
+                            Посмотреть все комментарии (@post.CommentsCount)
+                        </a>
+                    }
+                    <p class="text-muted small text-uppercase mt-1" style="font-size: 10px;">@post.CreatedAt.ToString("g")</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        $(document).on('click', '.like-btn', function () {
+            const postId = $(this).data('post-id');
+            const $btn = $(this);
+            const $icon = $btn.find('.like-icon');
+            const $likesCountText = $btn.closest('.card-body').find('.likes-count-text');
+
+            $.ajax({
+                url: '/Posts/ToggleLike',
+                type: 'POST',
+                data: { postId: postId },
+                success: function (response) {
+                    if (response.success) {
+                        if (response.isLiked) {
+                            $icon.removeClass('bi-heart').addClass('bi-heart-fill text-danger');
+                        } else {
+                            $icon.removeClass('bi-heart-fill text-danger').addClass('bi-heart');
+                        }
+                        $likesCountText.text(response.likesCount + ' отметок "Нравится"');
+                    }
+                }
+            });
+        });
+    </script>
+}

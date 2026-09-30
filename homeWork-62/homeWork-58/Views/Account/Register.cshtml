@@ -1,0 +1,33 @@
+﻿@model InstagramApp.Models.RegisterViewModel
+@{ ViewData["Title"] = "Регистрация"; }
+
+<div class="row justify-content-center mt-3">
+    <div class="col-md-5">
+        <div class="card p-4 text-center">
+            <h1 class="insta-brand mb-3">Instagram</h1>
+            <p class="text-muted small">Зарегистрируйтесь, чтобы смотреть фото и видео ваших друзей.</p>
+            <form asp-action="Register" method="post" enctype="multipart/form-data">
+                <div asp-validation-summary="All" class="text-danger small mb-2"></div>
+                <div class="mb-2"><input asp-for="Email" class="form-control search-input" placeholder="Электронная почта *" /></div>
+                <div class="mb-2"><input asp-for="UserName" class="form-control search-input" placeholder="Имя пользователя (Логин) *" /></div>
+                <div class="mb-2"><input asp-for="Name" class="form-control search-input" placeholder="Имя и фамилия" /></div>
+                <div class="mb-2"><input asp-for="PhoneNumber" class="form-control search-input" placeholder="Номер телефона" /></div>
+                <div class="mb-2">
+                    <select asp-for="Gender" class="form-select search-input">
+                        <option value="">Выберите пол...</option>
+                        <option value="Мужской">Мужской</option>
+                        <option value="Женский">Женский</option>
+                    </select>
+                </div>
+                <div class="mb-2"><textarea asp-for="Bio" class="form-control search-input" placeholder="О себе"></textarea></div>
+                <div class="mb-2 text-start">
+                    <label class="form-label small text-muted">Аватар профиля:</label>
+                    <input asp-for="AvatarFile" type="file" class="form-control" accept="image/*" />
+                </div>
+                <div class="mb-2"><input asp-for="Password" class="form-control search-input" placeholder="Пароль *" /></div>
+                <div class="mb-3"><input asp-for="ConfirmPassword" class="form-control search-input" placeholder="Подтвердите пароль *" /></div>
+                <button type="submit" class="btn btn-primary w-100 fw-bold">Зарегистрироваться</button>
+            </form>
+        </div>
+    </div>
+</div>

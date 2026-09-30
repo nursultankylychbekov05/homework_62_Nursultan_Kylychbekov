@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Instagram</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #fafafa; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .insta-nav { background: #fff; border-bottom: 1px solid #dbdbdb; height: 60px; position: sticky; top: 0; z-index: 1000; }
+        .insta-brand { font-family: 'Grand Hotel', cursive, sans-serif; font-size: 28px; color: #000; text-decoration: none; }
+        .search-input { background-color: #efefef; border: 1px solid #dbdbdb; border-radius: 8px; padding: 4px 12px; font-size: 14px; }
+        .card { border: 1px solid #dbdbdb; border-radius: 8px; }
+        .avatar-sm { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+        .avatar-lg { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <nav class="navbar insta-nav mb-4">
+        <div class="container max-width-935 d-flex justify-content-between align-items-center" style="max-width: 935px;">
+            <a class="insta-brand" asp-controller="Home" asp-action="Index">Instagram</a>
+            
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <form asp-controller="Users" asp-action="Search" method="get" class="d-flex">
+                    <input type="text" name="query" class="form-control search-input" placeholder="Поиск..." value="@ViewBag.Query" />
+                </form>
+
+                <div class="d-flex align-items-center gap-3 fs-4">
+                    <a asp-controller="Home" asp-action="Index" class="text-dark"><i class="bi bi-house-door-fill"></i></a>
+                    <a asp-controller="Posts" asp-action="Create" class="text-dark"><i class="bi bi-plus-square"></i></a>
+                    <a asp-controller="Users" asp-action="Profile" asp-route-id="@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value" class="text-dark">
+                        <i class="bi bi-person-circle"></i>
+                    </a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-link text-dark p-0 fs-4"><i class="bi bi-box-arrow-right"></i></button>
+                    </form>
+                </div>
+            }
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 935px;">
+        @RenderBody()
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
